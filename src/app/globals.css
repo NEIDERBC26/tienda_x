@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #060606;
+  --fg: #f4f4f5;
+  --muted: #a1a1aa;
+  --primary: #a3e635;
+  --secondary: #38bdf8;
+  --accent: #f97316;
+}
+
+* {
+  border-color: rgb(255 255 255 / 0.1);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: radial-gradient(circle at top, #101014 0%, #070709 40%, #050505 100%);
+  color: var(--fg);
+  font-family: var(--font-sans), sans-serif;
+}
+
+.editorial-title {
+  font-family: var(--font-mono), monospace;
+  letter-spacing: -0.03em;
+}

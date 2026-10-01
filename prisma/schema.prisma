@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          Int            @id @default(autoincrement())
+  name        String
+  slug        String         @unique
+  price       Decimal        @db.Decimal(10, 2)
+  description String
+  features    String[]
+  isPublished Boolean        @default(true)
+  categoryId  Int
+  category    Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images      ProductImage[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([name])
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model StoreSettings {
+  id             Int      @id @default(1)
+  storeName      String   @default("Tienda X")
+  logoUrl        String?
+  primaryColor   String   @default("#A3E635")
+  secondaryColor String   @default("#38BDF8")
+  accentColor    String   @default("#F97316")
+  whatsappNumber String?
+  instagramUrl   String?
+  facebookUrl    String?
+  tiktokUrl      String?
+  heroTitle      String   @default("Tenis con identidad propia")
+  heroSubtitle   String   @default("Catálogo premium con selección curada para running, lifestyle y cancha.")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

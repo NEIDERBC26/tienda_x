@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tienda_x_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tienda_x}
+      POSTGRES_USER: ${POSTGRES_USER:-tienda_x_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tienda_x_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tienda_x_user} -d ${POSTGRES_DB:-tienda_x}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tienda_x_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tienda_x_user}:${POSTGRES_PASSWORD:-tienda_x_password}@db:5432/${POSTGRES_DB:-tienda_x}?schema=public
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_SECRET: ${ADMIN_SECRET}
+      DEFAULT_WHATSAPP_NUMBER: ${DEFAULT_WHATSAPP_NUMBER}
+      NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+      RUN_SEED: ${RUN_SEED:-false}
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_data:/app/public/uploads
+
+volumes:
+  postgres_data:
+  uploads_data:
